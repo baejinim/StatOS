@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { getPostById } from "@/lib/hn";
 import { createMetadata, truncateDescription } from "@/lib/metadata";
+import { isFeatureEnabled } from "@/lib/features";
 import { stripHtmlTags } from "@/lib/utils";
 
 import HNPostPageClient from "./HNPostPageClient";
@@ -11,6 +13,11 @@ export const revalidate = 3600;
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
+  if (!isFeatureEnabled("hn")) {
+    return {
+      title: "Not Found",
+    };
+  }
   const params = await props.params;
   const id = params.id;
 
@@ -41,5 +48,8 @@ export async function generateMetadata(props: {
 }
 
 export default function HNPostPage() {
+  if (!isFeatureEnabled("hn")) {
+    notFound();
+  }
   return <HNPostPageClient />;
 }

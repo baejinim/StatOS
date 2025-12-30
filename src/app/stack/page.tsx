@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { StackPageClient } from "@/components/stack/StackPageClient";
 import { createMetadata } from "@/lib/metadata";
+import { isFeatureEnabled } from "@/lib/features";
 import { getStacks } from "@/lib/stack";
 
 export const metadata: Metadata = createMetadata({
@@ -18,6 +20,9 @@ export default async function StackPage({
 }: {
   searchParams: Promise<{ status?: string; platform?: string }>;
 }) {
+  if (!isFeatureEnabled("stack")) {
+    notFound();
+  }
   const params = await searchParams;
   const status = params.status || "active";
   const platform = params.platform || "";

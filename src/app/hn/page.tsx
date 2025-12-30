@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { createMetadata } from "@/lib/metadata";
+import { isFeatureEnabled } from "@/lib/features";
 
 import { HNPageClient } from "./HNPageClient";
 
@@ -13,5 +15,8 @@ export const metadata: Metadata = createMetadata({
 export const revalidate = 3600;
 
 export default function HNPage() {
+  if (!isFeatureEnabled("hn")) {
+    notFound();
+  }
   return <HNPageClient />;
 }

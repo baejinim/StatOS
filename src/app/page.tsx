@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { SpeakingList } from "@/components/home/SpeakingList";
 import { SpeakingListSkeleton } from "@/components/home/SpeakingListSkeleton";
 import { ArrowUpRight } from "@/components/icons/ArrowUpRight";
+import { isFeatureEnabled } from "@/lib/features";
 import { BufferLogoSVG, GitHubIcon, XIcon, YouTubeIcon } from "@/components/icons/SocialIcons";
 import {
   List,
@@ -130,12 +131,14 @@ export default function Home() {
               </List>
             </Section>
 
-            <Section>
-              <SectionHeading>Speaking</SectionHeading>
-              <Suspense fallback={<SpeakingListSkeleton />}>
-                <SpeakingList />
-              </Suspense>
-            </Section>
+            {isFeatureEnabled("speaking") && (
+              <Section>
+                <SectionHeading>Speaking</SectionHeading>
+                <Suspense fallback={<SpeakingListSkeleton />}>
+                  <SpeakingList />
+                </Suspense>
+              </Section>
+            )}
           </div>
         </div>
       </div>

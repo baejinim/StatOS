@@ -3,10 +3,14 @@ import { notFound } from "next/navigation";
 
 import { allAppDissectionItems } from "@/data/app-dissection";
 import { createArticleJsonLd, createMetadata, truncateDescription } from "@/lib/metadata";
+import { isFeatureEnabled } from "@/lib/features";
 
 import { AppDissectionDetail } from "./components/AppDissectionDetail";
 
 export async function generateStaticParams() {
+  if (!isFeatureEnabled("appDissection")) {
+    return [];
+  }
   return allAppDissectionItems.map((item) => ({
     slug: item.slug,
   }));
@@ -15,6 +19,11 @@ export async function generateStaticParams() {
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  if (!isFeatureEnabled("appDissection")) {
+    return {
+      title: "Not Found",
+    };
+  }
   const params = await props.params;
   const post = allAppDissectionItems.find((item) => item.slug === params.slug);
 
@@ -34,6 +43,9 @@ export async function generateMetadata(props: {
 }
 
 export default async function AppDissectionPostPage(props: { params: Promise<{ slug: string }> }) {
+  if (!isFeatureEnabled("appDissection")) {
+    notFound();
+  }
   const params = await props.params;
   const post = allAppDissectionItems.find((item) => item.slug === params.slug);
 

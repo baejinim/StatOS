@@ -6,7 +6,7 @@ import { List, ListItem, ListItemLabel } from "@/components/shared/ListComponent
 import { PageTitle } from "@/components/Typography";
 import { FancySeparator } from "@/components/ui/FancySeparator";
 import { createArticleJsonLd, createMetadata, truncateDescription } from "@/lib/metadata";
-import { getWritingPostContentBySlug } from "@/lib/notion";
+import { getWritingPostContentBySlug } from "@/lib/writing/fs";
 import { getAllWritingPosts } from "@/lib/writing";
 
 export const revalidate = 3600;

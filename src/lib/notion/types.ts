@@ -74,6 +74,7 @@ export type ProcessedBlock = {
   hasRowHeader?: boolean;
   cells?: RichTextItemResponse[][];
   tableRows?: ProcessedBlock[];
+  mathHtml?: string; // KaTeX-rendered HTML for math expressions
 };
 
 // Generic Notion item metadata

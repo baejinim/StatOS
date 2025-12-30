@@ -1,5 +1,6 @@
 import { InfiniteScrollPage, useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { getWritingDatabaseItems, NotionItem } from "@/lib/notion";
+import type { NotionItem } from "@/lib/notion";
+import { getAllWritingPostsAsNotionItems } from "@/lib/writing/fs";
 
 export type WritingPage = InfiniteScrollPage<NotionItem>;
 
@@ -12,16 +13,5 @@ export function useWritingPosts() {
 }
 
 export async function getAllWritingPosts(): Promise<NotionItem[]> {
-  let allPosts: NotionItem[] = [];
-  let cursor: string | undefined;
-  let hasMore = true;
-
-  while (hasMore) {
-    const { items, nextCursor } = await getWritingDatabaseItems(cursor, 100);
-    allPosts = [...allPosts, ...items];
-    cursor = nextCursor || undefined;
-    hasMore = !!nextCursor;
-  }
-
-  return allPosts;
+  return getAllWritingPostsAsNotionItems();
 }
