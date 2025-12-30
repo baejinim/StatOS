@@ -10,20 +10,24 @@ export interface EmailSubscriptionRow {
   type: string;
 }
 
-// Environment validation
-if (!process.env.UPSTASH_REDIS_REST_URL) {
-  throw new Error("UPSTASH_REDIS_REST_URL environment variable is not set");
-}
+// Lazy initialization of Redis client to avoid build-time errors
+let redis: Redis | null = null;
 
-if (!process.env.UPSTASH_REDIS_REST_TOKEN) {
-  throw new Error("UPSTASH_REDIS_REST_TOKEN environment variable is not set");
+function getRedisClient(): Redis {
+  if (!redis) {
+    if (!process.env.UPSTASH_REDIS_REST_URL) {
+      throw new Error("UPSTASH_REDIS_REST_URL environment variable is not set");
+    }
+    if (!process.env.UPSTASH_REDIS_REST_TOKEN) {
+      throw new Error("UPSTASH_REDIS_REST_TOKEN environment variable is not set");
+    }
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+  }
+  return redis;
 }
-
-// Create singleton Redis client
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
 
 // Redis key for HN subscribers set
 const HN_SUBSCRIBERS_KEY = "hn:subscribers";
@@ -32,7 +36,8 @@ const HN_SUBSCRIBERS_KEY = "hn:subscribers";
  * Fetch all email subscribers for Hacker News digest
  */
 export async function getHNSubscribers(): Promise<EmailSubscriptionRow[]> {
-  const emails = await redis.smembers(HN_SUBSCRIBERS_KEY);
+  const client = getRedisClient();
+  const emails = await client.smembers(HN_SUBSCRIBERS_KEY);
   return emails.map((email) => ({ email, type: "HACKER_NEWS" }));
 }
 
@@ -40,7 +45,8 @@ export async function getHNSubscribers(): Promise<EmailSubscriptionRow[]> {
  * Fetch a single subscriber by email
  */
 export async function getSubscriberByEmail(email: string): Promise<EmailSubscriptionRow | null> {
-  const exists = await redis.sismember(HN_SUBSCRIBERS_KEY, email);
+  const client = getRedisClient();
+  const exists = await client.sismember(HN_SUBSCRIBERS_KEY, email);
   return exists ? { email, type: "HACKER_NEWS" } : null;
 }
 
@@ -48,7 +54,8 @@ export async function getSubscriberByEmail(email: string): Promise<EmailSubscrip
  * Delete a subscription by email
  */
 export async function deleteSubscription(email: string): Promise<boolean> {
-  const removed = await redis.srem(HN_SUBSCRIBERS_KEY, email);
+  const client = getRedisClient();
+  const removed = await client.srem(HN_SUBSCRIBERS_KEY, email);
   return removed > 0;
 }
 
@@ -56,7 +63,8 @@ export async function deleteSubscription(email: string): Promise<boolean> {
  * Get count of HN subscribers
  */
 export async function getHNSubscriberCount(): Promise<number> {
-  return await redis.scard(HN_SUBSCRIBERS_KEY);
+  const client = getRedisClient();
+  return await client.scard(HN_SUBSCRIBERS_KEY);
 }
 
 /**
@@ -65,14 +73,15 @@ export async function getHNSubscriberCount(): Promise<number> {
 export async function createSubscription(
   email: string,
 ): Promise<{ success: boolean; alreadyExists: boolean }> {
+  const client = getRedisClient();
   // Check if subscription already exists
-  const exists = await redis.sismember(HN_SUBSCRIBERS_KEY, email);
+  const exists = await client.sismember(HN_SUBSCRIBERS_KEY, email);
   if (exists) {
     return { success: false, alreadyExists: true };
   }
 
   // Add to subscribers set
-  await redis.sadd(HN_SUBSCRIBERS_KEY, email);
+  await client.sadd(HN_SUBSCRIBERS_KEY, email);
   return { success: true, alreadyExists: false };
 }
 
@@ -81,8 +90,9 @@ export async function createSubscription(
  */
 export async function bulkAddSubscribers(emails: string[]): Promise<number> {
   if (emails.length === 0) return 0;
+  const client = getRedisClient();
   // Use pipeline for bulk operations
-  const pipeline = redis.pipeline();
+  const pipeline = client.pipeline();
   for (const email of emails) {
     pipeline.sadd(HN_SUBSCRIBERS_KEY, email);
   }

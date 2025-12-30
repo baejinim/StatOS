@@ -9,6 +9,7 @@ import { Headphones3 } from "@/components/icons/Headphones3";
 import { Home } from "@/components/icons/Home";
 import { Triangle } from "@/components/icons/Triangle";
 import { IconProps } from "@/components/icons/types";
+import { isFeatureEnabled } from "@/lib/features";
 
 export interface NavigationItem {
   id: string;
@@ -18,6 +19,7 @@ export interface NavigationItem {
   keywords?: string[];
   isActive?: (pathname: string) => boolean;
   section?: "main" | "projects";
+  feature?: string;
 }
 
 export const navigationItems: NavigationItem[] = [
@@ -38,6 +40,7 @@ export const navigationItems: NavigationItem[] = [
     keywords: ["writing", "blog", "posts"],
     isActive: (pathname) => pathname.startsWith("/writing"),
     section: "main",
+    feature: "writing",
   },
   {
     id: "better-hn",
@@ -47,6 +50,7 @@ export const navigationItems: NavigationItem[] = [
     keywords: ["hackernews", "hn", "news"],
     isActive: (pathname) => pathname.startsWith("/hn"),
     section: "projects",
+    feature: "hn",
   },
 
   {
@@ -57,6 +61,7 @@ export const navigationItems: NavigationItem[] = [
     keywords: ["app", "dissection", "analysis"],
     isActive: (pathname) => pathname.startsWith("/app-dissection"),
     section: "projects",
+    feature: "appDissection",
   },
   {
     id: "stack",
@@ -66,6 +71,7 @@ export const navigationItems: NavigationItem[] = [
     keywords: ["stack", "tools", "tech"],
     isActive: (pathname) => pathname.startsWith("/stack"),
     section: "projects",
+    feature: "stack",
   },
   {
     id: "ama",
@@ -75,6 +81,7 @@ export const navigationItems: NavigationItem[] = [
     keywords: ["ama", "questions", "ask"],
     isActive: (pathname) => pathname.startsWith("/ama"),
     section: "projects",
+    feature: "ama",
   },
 
   {
@@ -85,6 +92,7 @@ export const navigationItems: NavigationItem[] = [
     keywords: ["listening", "music", "audio"],
     isActive: (pathname) => pathname === "/listening",
     section: "projects",
+    feature: "listening",
   },
   {
     id: "good-websites",
@@ -94,14 +102,21 @@ export const navigationItems: NavigationItem[] = [
     keywords: ["good websites", "websites", "inspiration"],
     isActive: (pathname) => pathname.startsWith("/sites"),
     section: "projects",
+    feature: "sites",
   },
 ];
 
 // Helper functions to filter navigation items
 export const getMainNavigationItems = () =>
-  navigationItems.filter((item) => item.section === "main");
+  navigationItems.filter(
+    (item) => item.section === "main" && (!item.feature || isFeatureEnabled(item.feature as any)),
+  );
 
 export const getProjectNavigationItems = () =>
-  navigationItems.filter((item) => item.section === "projects");
+  navigationItems.filter(
+    (item) =>
+      item.section === "projects" && (!item.feature || isFeatureEnabled(item.feature as any)),
+  );
 
-export const getAllNavigationItems = () => navigationItems;
+export const getAllNavigationItems = () =>
+  navigationItems.filter((item) => !item.feature || isFeatureEnabled(item.feature as any));

@@ -1,9 +1,13 @@
 import { notFound } from "next/navigation";
 
 import { renderBlocks } from "@/components/renderBlocks";
+import { isFeatureEnabled } from "@/lib/features";
 import { getFullContent } from "@/lib/notion";
 
 export default async function EpisodePage(props: { params: Promise<{ id: string }> }) {
+  if (!isFeatureEnabled("designDetails")) {
+    notFound();
+  }
   const params = await props.params;
   const id = params.id;
   const content = await getFullContent(id);

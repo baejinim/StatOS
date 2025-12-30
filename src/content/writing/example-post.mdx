@@ -1,0 +1,78 @@
+---
+title: "Example Post"
+date: "2024-01-01"
+category: "mathstat"
+tags: ["statistics", "example"]
+summary: "This is an example post"
+---
+
+# Example Post
+
+This is an example blog post written in Markdown.
+
+## Section 1
+
+Here's some content with **bold text** and *italic text*.
+
+### Code Example
+
+```typescript
+function example() {
+  return "Hello, World!";
+}
+```
+
+## Section 2
+
+Here's a list:
+
+- Item 1
+- Item 2
+- Item 3
+
+And a numbered list:
+
+1. First item
+2. Second item
+3. Third item
+
+> This is a blockquote.
+
+---
+
+This is a horizontal rule above.
+
+### Example 7.1.1.
+Estimator(추정량)의 품질을 어떻게 평가할 것인가..?
+
+주어진 상황 : $X_1, X_2, \dots, X_n \sim N(\mu, \sigma^2)$ ,$S^2 = \frac{1}{n-1}\sum_{i=1}^{n}(X_i - \bar{X})^2$
+여기서 parameter(모수) $\sigma^2$ 를 추정하려고 함
+즉, $\theta = \sigma^2$를 추정하기 위한 추정량 $\hat{\theta}$를 비교
+
+3가지 추정량을 문제에서 제시함 
+$\hat{\theta}_1 = S^2, \quad \hat{\theta}_2 = \frac{n-1}{n}S^2, \quad \hat{\theta}_3 = 17$
+
+Loss function 
+$\mathcal{L}(\theta, \hat{\theta}) = (\theta - \hat{\theta})^2$
+추정값이 실제값과 얼마나 차이가 나는지를 나타내는 Quadratic Loss(제곱 손실)
+
+Risk function
+$R(\theta, \hat{\theta}) = E[\mathcal{L}(\theta, \hat{\theta})] = E[(\theta - \hat{\theta})^2]$
+"이 추정량이 얼마나 안정적으로 정확한가?"
+평균적인 손실
+
+모든 $\theta$에 대해 $R(\theta, \hat{\theta})$를 동시에 최소화하는 추정량이 존재할까?
+
+## Block Math Example
+
+블록 수식 예제:
+
+$$
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+$$
+
+또 다른 블록 수식:
+
+$$
+f(x) = \sum_{n=0}^{\infty} \frac{f^{(n)}(a)}{n!}(x-a)^n
+$$

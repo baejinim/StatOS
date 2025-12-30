@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { GoodWebsitesPageClient } from "@/components/good-websites/GoodWebsitesPageClient";
 import { getGoodWebsites } from "@/lib/goodWebsites";
 import { createMetadata } from "@/lib/metadata";
+import { isFeatureEnabled } from "@/lib/features";
 
 export const metadata: Metadata = createMetadata({
   title: "Good websites",
@@ -18,6 +20,9 @@ export default async function GoodWebsitesPage({
 }: {
   searchParams: Promise<{ tag?: string }>;
 }) {
+  if (!isFeatureEnabled("sites")) {
+    notFound();
+  }
   const params = await searchParams;
   const tag = params.tag || "";
 

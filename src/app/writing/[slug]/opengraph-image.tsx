@@ -1,4 +1,5 @@
-import { getWritingPostContentBySlug } from "@/lib/notion";
+import { getWritingPostContentBySlug } from "@/lib/writing/fs";
+import { SITE_CONFIG } from "@/lib/metadata";
 import { generateOGImage } from "@/lib/og-utils";
 
 export const runtime = "nodejs";
@@ -9,23 +10,33 @@ export const size = {
 };
 export const contentType = "image/png";
 
+/**
+ * Get base URL with fallback
+ */
+function getBaseUrl(): string {
+  return process.env.NEXT_PUBLIC_SITE_URL || SITE_CONFIG.url || "http://localhost:3000";
+}
+
 export default async function Image(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
   const slug = params.slug;
   const content = await getWritingPostContentBySlug(slug);
 
+  const baseUrl = getBaseUrl();
+  const baseHost = baseUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
   if (!content) {
     // Fallback to generic title if post not found
     return generateOGImage({
       title: "Writing",
-      url: "brianlovin.com/writing",
+      url: `${baseHost}/writing`,
     });
   }
 
   const { metadata } = content;
 
   return generateOGImage({
-    title: metadata.title,
-    url: `brianlovin.com/writing/${slug}`,
+    title: metadata.title || "Writing",
+    url: `${baseHost}/writing/${slug}`,
   });
 }

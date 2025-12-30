@@ -157,10 +157,30 @@ function renderSingleBlock(block: ProcessedBlock, isPreview: boolean): ReactNode
         </blockquote>
       );
     case "paragraph":
+      // If block has math HTML (inline math only), render it in paragraph
+      if (block.mathHtml) {
+        return (
+          <p
+            key={block.id}
+            className="text-primary leading-[1.6]"
+            dangerouslySetInnerHTML={{ __html: block.mathHtml }}
+          />
+        );
+      }
       return (
         <p key={block.id} className="text-primary leading-[1.6]">
           {renderRichText(block.content)}
         </p>
+      );
+    case "math":
+      // Block math: render as div (not inside paragraph to avoid invalid nesting)
+      // KaTeX already wraps in appropriate elements, we just need a container div
+      return (
+        <div
+          key={block.id}
+          className="text-primary my-6 overflow-x-auto"
+          dangerouslySetInnerHTML={{ __html: block.mathHtml || "" }}
+        />
       );
     case "heading_1":
       return (

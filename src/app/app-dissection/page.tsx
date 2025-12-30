@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { allAppDissectionItems, AppDissectionItemType } from "@/data/app-dissection";
 import { createMetadata } from "@/lib/metadata";
+import { isFeatureEnabled } from "@/lib/features";
 
 export const metadata: Metadata = createMetadata({
   title: "App Dissection",
@@ -13,6 +15,9 @@ export const metadata: Metadata = createMetadata({
 });
 
 export default function AppDissectionIndex() {
+  if (!isFeatureEnabled("appDissection")) {
+    notFound();
+  }
   return (
     <div className="@container flex flex-1 flex-col overflow-hidden">
       <div className="flex-1 overflow-y-auto">

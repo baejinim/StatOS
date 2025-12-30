@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import AMADetail from "@/app/ama/AMADetail";
 import { createMetadata, truncateDescription } from "@/lib/metadata";
+import { isFeatureEnabled } from "@/lib/features";
 import { getAmaItemContent } from "@/lib/notion";
 
 export const revalidate = 3600;
@@ -9,6 +11,11 @@ export const revalidate = 3600;
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
+  if (!isFeatureEnabled("ama")) {
+    return {
+      title: "Not Found",
+    };
+  }
   const params = await props.params;
   const id = params.id;
 
@@ -36,5 +43,8 @@ export async function generateMetadata(props: {
 }
 
 export default function AMADetailPage() {
+  if (!isFeatureEnabled("ama")) {
+    notFound();
+  }
   return <AMADetail />;
 }

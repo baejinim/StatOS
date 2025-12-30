@@ -1,4 +1,5 @@
 import "./globals.css";
+import "katex/dist/katex.min.css";
 
 import type { Metadata } from "next";
 import { Inter, Source_Serif_4 } from "next/font/google";

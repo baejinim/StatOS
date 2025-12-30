@@ -1,8 +1,23 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import { LiveNumber } from "@/components/LiveNumber";
+import { isFeatureEnabled } from "@/lib/features";
 
 export default function NumbersPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isFeatureEnabled("numbers")) {
+      router.replace("/404");
+    }
+  }, [router]);
+
+  if (!isFeatureEnabled("numbers")) {
+    return null;
+  }
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
