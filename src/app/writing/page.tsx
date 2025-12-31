@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
-  List,
-  ListItem,
-  ListItemLabel,
-  Section,
-  SectionHeading,
+    List,
+    ListItem,
+    ListItemLabel,
+    Section,
+    SectionHeading,
 } from "@/components/shared/ListComponents";
 import { PageTitle } from "@/components/Typography";
 import { createMetadata } from "@/lib/metadata";
