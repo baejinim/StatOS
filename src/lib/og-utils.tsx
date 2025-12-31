@@ -28,30 +28,53 @@ export const URL_SIZE = 32;
 // Avatar
 export const AVATAR_SIZE = 100;
 
-// Font loading from Google Fonts with timeout protection
-async function loadGoogleFont(font: string, weight: number, text: string): Promise<ArrayBuffer> {
+// Font loading from Google Fonts with timeout protection and validation
+async function loadGoogleFont(
+  font: string,
+  weight: number,
+  text: string,
+): Promise<ArrayBuffer> {
   const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=${encodeURIComponent(text)}`;
 
   const cssResponse = await withTimeout(fetch(url), FONT_TIMEOUT_MS);
   const css = await cssResponse.text();
   const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/);
 
-  if (resource) {
-    const fontResponse = await withTimeout(fetch(resource[1]), FONT_TIMEOUT_MS);
-    if (fontResponse.status === 200) {
-      return fontResponse.arrayBuffer();
-    }
+  if (!resource) {
+    throw new Error(`Failed to parse font URL from CSS for ${font} ${weight}`);
   }
 
-  throw new Error(`Failed to load font: ${font} ${weight}`);
+  const fontUrl = resource[1];
+  const fontResponse = await withTimeout(fetch(fontUrl), FONT_TIMEOUT_MS);
+
+  if (!fontResponse.ok) {
+    throw new Error(
+      `Failed to fetch font: ${fontUrl} (status: ${fontResponse.status})`,
+    );
+  }
+
+  const arrayBuffer = await fontResponse.arrayBuffer();
+
+  // Validate font data is not empty
+  if (arrayBuffer.byteLength === 0) {
+    throw new Error(`Font data is empty for ${font} ${weight}`);
+  }
+
+  return arrayBuffer;
 }
 
 // Load avatar as base64 (async file I/O)
 export async function loadAvatar(): Promise<string> {
   const avatarPath = path.join(process.cwd(), "public/img/avatar.jpg");
-  const avatarBuffer = await fs.readFile(avatarPath);
-  const base64 = avatarBuffer.toString("base64");
-  return `data:image/jpeg;base64,${base64}`;
+
+  try {
+    const avatarBuffer = await fs.readFile(avatarPath);
+    const base64 = avatarBuffer.toString("base64");
+    return `data:image/jpeg;base64,${base64}`;
+  } catch (error) {
+    console.error(`Failed to load avatar from ${avatarPath}:`, error);
+    throw new Error(`Avatar not found at ${avatarPath}`);
+  }
 }
 
 interface OGImageProps {
@@ -76,20 +99,29 @@ export function truncateOGTitle(title: string, maxLines: number = 3): string {
   return lastSpace > 0 ? `${truncated.slice(0, lastSpace)}...` : `${truncated}...`;
 }
 
-export async function generateOGImage({ title, url }: OGImageProps) {
+export async function generateOGImage({
+  title,
+  url,
+}: OGImageProps): Promise<ImageResponse> {
   try {
     // Combine all text for font loading
     const allText = `${title}${url}`;
 
-    const [interRegularFont, interSemiBoldFont, avatarData] = await Promise.all([
-      loadGoogleFont("Inter", 400, allText),
-      loadGoogleFont("Inter", 700, allText),
-      loadAvatar(),
-    ]);
+    const [interRegularFont, interSemiBoldFont, avatarData] = await Promise.all(
+      [
+        loadGoogleFont("Inter", 400, allText),
+        loadGoogleFont("Inter", 700, allText),
+        loadAvatar(),
+      ],
+    );
 
     // Validate font data
-    if (!interRegularFont || !interSemiBoldFont) {
-      throw new Error("Failed to load fonts: received invalid data");
+    if (!interRegularFont || interRegularFont.byteLength === 0) {
+      throw new Error("Invalid font data for Inter 400");
+    }
+
+    if (!interSemiBoldFont || interSemiBoldFont.byteLength === 0) {
+      throw new Error("Invalid font data for Inter 700");
     }
 
     return new ImageResponse(
@@ -157,13 +189,13 @@ export async function generateOGImage({ title, url }: OGImageProps) {
           {
             name: "Inter",
             data: interRegularFont,
-            style: "normal" as const,
+            style: "normal",
             weight: 400,
           },
           {
             name: "Inter",
             data: interSemiBoldFont,
-            style: "normal" as const,
+            style: "normal",
             weight: 700,
           },
         ],
