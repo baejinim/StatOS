@@ -87,62 +87,69 @@ export async function generateOGImage({ title, url }: OGImageProps) {
       loadAvatar(),
     ]);
 
-    return new ImageResponse(
-      <div
-        style={{
-          width: OG_WIDTH,
-          height: OG_HEIGHT,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: OG_PADDING,
-          backgroundColor: "white",
-        }}
-      >
-        {/* Avatar at the top */}
-        <div style={{ display: "flex" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={avatarData}
-            alt="Avatar"
-            width={AVATAR_SIZE}
-            height={AVATAR_SIZE}
-            style={{
-              borderRadius: "50%",
-            }}
-          />
-        </div>
+    // Validate font data
+    if (!interRegularFont || !interSemiBoldFont) {
+      throw new Error("Failed to load fonts: received invalid data");
+    }
 
-        {/* Title and URL at the bottom */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <div
-            style={{
-              fontSize: TITLE_SIZE,
-              fontFamily: "Inter",
-              fontWeight: 700,
-              color: PRIMARY_COLOR,
-              lineHeight: 1.2,
-              letterSpacing: "-0.12rem",
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
-          >
-            {title.length > 80 ? title.slice(0, 80) + "..." : title}
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: OG_WIDTH,
+            height: OG_HEIGHT,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: OG_PADDING,
+            backgroundColor: "white",
+          }}
+        >
+          {/* Avatar at the top */}
+          <div style={{ display: "flex" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={avatarData}
+              alt="Avatar"
+              width={AVATAR_SIZE}
+              height={AVATAR_SIZE}
+              style={{
+                borderRadius: "50%",
+              }}
+            />
           </div>
-          <div
-            style={{
-              fontSize: URL_SIZE,
-              fontFamily: "Inter",
-              fontWeight: 400,
-              color: TERTIARY_COLOR,
-            }}
-          >
-            brianlovin.com
+
+          {/* Title and URL at the bottom */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            <div
+              style={{
+                fontSize: TITLE_SIZE,
+                fontFamily: "Inter",
+                fontWeight: 700,
+                color: PRIMARY_COLOR,
+                lineHeight: 1.2,
+                letterSpacing: "-0.12rem",
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+            >
+              {title.length > 80 ? title.slice(0, 80) + "..." : title}
+            </div>
+            <div
+              style={{
+                fontSize: URL_SIZE,
+                fontFamily: "Inter",
+                fontWeight: 400,
+                color: TERTIARY_COLOR,
+              }}
+            >
+              {url}
+            </div>
           </div>
         </div>
-      </div>,
+      ),
       {
         width: OG_WIDTH,
         height: OG_HEIGHT,
@@ -150,13 +157,13 @@ export async function generateOGImage({ title, url }: OGImageProps) {
           {
             name: "Inter",
             data: interRegularFont,
-            style: "normal",
+            style: "normal" as const,
             weight: 400,
           },
           {
             name: "Inter",
             data: interSemiBoldFont,
-            style: "normal",
+            style: "normal" as const,
             weight: 700,
           },
         ],
