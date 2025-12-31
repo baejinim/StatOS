@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
-    List,
-    ListItem,
-    ListItemLabel,
-    Section,
-    SectionHeading,
+  List,
+  ListItem,
+  ListItemLabel,
+  Section,
+  SectionHeading,
 } from "@/components/shared/ListComponents";
 import { PageTitle } from "@/components/Typography";
 import { createMetadata } from "@/lib/metadata";
@@ -15,7 +15,7 @@ import { getAllWritingPosts } from "@/lib/writing";
 export const metadata: Metadata = createMetadata({
   title: "Writing",
   description:
-    "Thoughts on design, engineering, and building products. Essays and reflections from Brian Lovin.",
+    "Thoughts on statistics, programming, and regression analysis.",
   path: "/writing",
 });
 

@@ -15,9 +15,9 @@ import {
 import { createMetadata, createPersonJsonLd } from "@/lib/metadata";
 
 export const metadata: Metadata = createMetadata({
-  title: "Brian Lovin",
+  title: "Jiwon Bae",
   description:
-    "Brian Lovin is a designer and software engineer living in San Francisco, currently designing AI products at Notion.",
+    "Jiwon Bae is a student at Konkuk University, studying Computer Science and Applied Statistics.",
   path: "/",
 });
 
