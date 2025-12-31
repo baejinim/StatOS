@@ -1,6 +1,6 @@
 import { InfiniteScrollPage, useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import type { NotionItem } from "@/lib/notion";
 import { getAllWritingPostsAsNotionItems } from "@/lib/writing/fs";
+import type { NotionItem } from "@/lib/writing/types";
 
 export type WritingPage = InfiniteScrollPage<NotionItem>;
 

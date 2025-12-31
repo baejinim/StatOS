@@ -1,7 +1,10 @@
 import { ReactNode } from "react";
 
 import { CodeBlock } from "@/components/CodeBlock";
-import type { ProcessedBlock, RichTextContent, RichTextItemResponse } from "@/lib/notion";
+import type { ProcessedBlock, RichTextContent } from "@/lib/writing/types";
+
+// Minimal type for rich text items used in table cells
+type RichTextItemResponse = { plain_text: string };
 
 // URL regex pattern to match http/https URLs
 const URL_REGEX = /(https?:\/\/[^\s]+)/g;

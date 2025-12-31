@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import {
   List,
@@ -27,10 +28,7 @@ export default async function WritingPage({
 }) {
   const params = await searchParams;
   // Normalize search query: trim, lowercase, normalize whitespace
-  const searchQuery = (params.q || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ");
+  const searchQuery = (params.q || "").trim().toLowerCase().replace(/\s+/g, " ");
   // Normalize tag and category filters
   const tagFilter = (params.tag || "").trim();
   const categoryFilter = (params.category || "").trim().toLowerCase();
@@ -83,14 +81,7 @@ export default async function WritingPage({
   // Sort years in descending order
   const sortedYears = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a));
 
-  // Get all unique tags and categories for filter UI
-  const allPosts = await getAllWritingPosts();
-  const allTags = Array.from(
-    new Set(allPosts.flatMap((post) => (post as any).tags || [])),
-  ).sort();
-  const allCategories = Array.from(
-    new Set(allPosts.map((post) => post.category).filter(Boolean)),
-  ).sort();
+  // (Filters computed from params; global tag/category lists removed to keep code minimal)
 
   return (
     <div data-scrollable className="flex-1 overflow-y-auto">
@@ -103,18 +94,13 @@ export default async function WritingPage({
               {searchQuery && (
                 <span className="bg-tertiary rounded px-2 py-1">Search: {searchQuery}</span>
               )}
-              {tagFilter && (
-                <span className="bg-tertiary rounded px-2 py-1">Tag: {tagFilter}</span>
-              )}
+              {tagFilter && <span className="bg-tertiary rounded px-2 py-1">Tag: {tagFilter}</span>}
               {categoryFilter && (
                 <span className="bg-tertiary rounded px-2 py-1">Category: {categoryFilter}</span>
               )}
-              <a
-                href="/writing"
-                className="text-secondary hover:text-primary underline"
-              >
+              <Link href="/writing" className="text-secondary hover:text-primary underline">
                 Clear filters
-              </a>
+              </Link>
             </div>
           )}
         </Section>

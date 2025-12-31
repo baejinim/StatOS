@@ -16,9 +16,7 @@ function getBaseUrl(): string {
     return SITE_CONFIG.url;
   }
   // Final fallback for local development
-  return process.env.NODE_ENV === "production"
-    ? "https://localhost"
-    : "http://localhost:3000";
+  return process.env.NODE_ENV === "production" ? "https://localhost" : "http://localhost:3000";
 }
 
 export async function GET() {
@@ -36,9 +34,10 @@ export async function GET() {
     });
 
     // Get the most recent post date for feed updated time
-    const mostRecentDate = sortedPosts.length > 0
-      ? new Date(sortedPosts[0].published || sortedPosts[0].createdTime)
-      : new Date();
+    const mostRecentDate =
+      sortedPosts.length > 0
+        ? new Date(sortedPosts[0].published || sortedPosts[0].createdTime)
+        : new Date();
 
     // Create the feed
     const feed = new Feed({
@@ -81,7 +80,7 @@ export async function GET() {
       // Ensure title and description are not empty
       const title = post.title || "Untitled";
       let description = post.excerpt || "";
-      
+
       // Truncate description if too long (240-300 chars recommended for RSS)
       if (description.length > 300) {
         description = description.substring(0, 297) + "...";
@@ -94,7 +93,11 @@ export async function GET() {
         description,
         date: publishDate,
         published: publishDate,
-        image: post.featureImage ? (post.featureImage.startsWith("http") ? post.featureImage : `${baseUrl}${post.featureImage}`) : undefined,
+        image: post.featureImage
+          ? post.featureImage.startsWith("http")
+            ? post.featureImage
+            : `${baseUrl}${post.featureImage}`
+          : undefined,
         author: [
           {
             name: SITE_CONFIG.author.name,

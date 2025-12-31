@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Suspense } from "react";
 
-import { SpeakingList } from "@/components/home/SpeakingList";
-import { SpeakingListSkeleton } from "@/components/home/SpeakingListSkeleton";
+// speaking removed
 import { ArrowUpRight } from "@/components/icons/ArrowUpRight";
-import { isFeatureEnabled } from "@/lib/features";
-import { BufferLogoSVG, GitHubIcon, XIcon, YouTubeIcon } from "@/components/icons/SocialIcons";
+import { GitHubIcon, XIcon, YouTubeIcon } from "@/components/icons/SocialIcons";
 import {
   List,
   ListItem,
@@ -39,7 +36,7 @@ export default function Home() {
             <Section>
               <Image
                 src="/img/avatar.jpg"
-                alt="Brian Lovin"
+                alt="Jiwon Bae"
                 width={60}
                 height={60}
                 draggable={false}
@@ -47,27 +44,26 @@ export default function Home() {
               />
 
               <h1 id="home-title" className="text-2xl font-semibold">
-                Brian Lovin
+                Jiwon Bae
               </h1>
 
               <p className="text-secondary text-2xl font-semibold text-pretty">
-                I’m a software designer living in San Francisco, currently making AI products at{" "}
-                Notion.
+                Student at Konkuk Univ, studying Computer Science & Applied Statistics
               </p>
             </Section>
 
             <Section className="flex flex-row gap-2">
-              <ListItem href="https://x.com/brian_lovin" className="group -ml-1 p-2">
+              <ListItem href="https://x.com" className="group -ml-1 p-2">
                 <XIcon size={28} className="text-quaternary group-hover:text-primary select-none" />
               </ListItem>
-              <ListItem href="https://www.youtube.com/@brian_lovin" className="group p-2">
+              <ListItem href="https://www.youtube.com" className="group p-2">
                 <YouTubeIcon
                   size={32}
                   className="text-quaternary select-none group-hover:text-[#FF0302]"
                   playIconClassName="fill-[var(--background-color-main)] sm:fill-[var(--background-color-elevated)]  group-hover:fill-white"
                 />
               </ListItem>
-              <ListItem href="https://github.com/brianlovin" className="group p-2">
+              <ListItem href="https://github.com/baejinim" className="group p-2">
                 <GitHubIcon
                   size={28}
                   className="text-quaternary group-hover:text-primary select-none"
@@ -98,47 +94,7 @@ export default function Home() {
               </List>
             </Section>
 
-            <Section>
-              <SectionHeading>Work</SectionHeading>
-              <List className="gap-8">
-                {work.map(({ name, href, role, period, icon }) => (
-                  <ListItem
-                    key={name}
-                    href={href}
-                    className="flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:gap-3"
-                  >
-                    {icon.type === "image" ? (
-                      <Image
-                        width={40}
-                        height={40}
-                        src={icon.src}
-                        alt={icon.alt}
-                        className="mb-2 size-7 rounded-md select-none sm:mb-0 sm:size-5"
-                        draggable={false}
-                      />
-                    ) : (
-                      <icon.component className="text-primary mb-2 size-7 sm:mb-0 sm:size-5" />
-                    )}
-                    <div className="flex items-center gap-2 sm:contents">
-                      <ListItemLabel>{name}</ListItemLabel>
-                      <ListItemSubLabel>{role}</ListItemSubLabel>
-                    </div>
-                    <ListItemSubLabel className="font-mono text-[19px] opacity-80 sm:ml-auto">
-                      {period}
-                    </ListItemSubLabel>
-                  </ListItem>
-                ))}
-              </List>
-            </Section>
-
-            {isFeatureEnabled("speaking") && (
-              <Section>
-                <SectionHeading>Speaking</SectionHeading>
-                <Suspense fallback={<SpeakingListSkeleton />}>
-                  <SpeakingList />
-                </Suspense>
-              </Section>
-            )}
+            {/* Work and Speaking sections removed to keep site focused on Writing */}
           </div>
         </div>
       </div>
@@ -153,143 +109,6 @@ const projects = [
     description: "Notes on software and other things",
     external: false,
   },
-  {
-    name: "HN",
-    href: "/hn",
-    description: "A minimal hacker news reader",
-    external: false,
-  },
-  {
-    name: "App Dissection",
-    href: "/app-dissection",
-    description: "Breaking down well-designed apps",
-    external: false,
-  },
-  {
-    name: "Stack",
-    href: "/stack",
-    description: "My favorite apps and tools",
-    external: false,
-  },
-  {
-    name: "AMA",
-    href: "/ama",
-    description: "Ask me anything",
-    external: false,
-  },
-  {
-    name: "Listening",
-    href: "/listening",
-    description: "What I'm listening to",
-    external: false,
-  },
-  {
-    name: "Good websites",
-    href: "/sites",
-    description: "A curated collection of good websites",
-    external: false,
-  },
-  {
-    name: "Staff Design",
-    href: "https://staff.design",
-    description: "Navigating the IC career path",
-    external: true,
-  },
-  {
-    name: "Design Details",
-    href: "https://designdetails.fm",
-    description: "A podcast about design and technology",
-    external: true,
-  },
-  {
-    name: "How to Computer Better",
-    href: "https://brianlovin.notion.site/how-to-computer-better",
-    description: "Get good at computering",
-    external: true,
-  },
-  {
-    name: "Crit",
-    href: "https://www.youtube.com/playlist?list=PLJu44Klx1pB_8GSOUeDNDllPICvMJKSut",
-    description: "App design critique",
-    external: true,
-  },
 ];
 
-type WorkIcon =
-  | { type: "image"; src: string; alt: string }
-  | { type: "svg"; component: React.ComponentType<{ className?: string }> };
-
-interface WorkItem {
-  name: string;
-  href: string;
-  role: string;
-  period: string;
-  icon: WorkIcon;
-}
-
-const work: WorkItem[] = [
-  {
-    name: "Notion",
-    href: "https://notion.com",
-    role: "Product Designer",
-    period: "Current",
-    icon: {
-      type: "image",
-      src: "/img/notion.png",
-      alt: "Notion",
-    },
-  },
-  {
-    name: "Campsite",
-    href: "https://campsite.com",
-    role: "Co-founder",
-    period: "2022–25",
-    icon: {
-      type: "image",
-      src: "/img/campsite.png",
-      alt: "Campsite",
-    },
-  },
-  {
-    name: "GitHub",
-    href: "https://github.com/mobile",
-    role: "Product Designer",
-    period: "2018–22",
-    icon: {
-      type: "svg",
-      component: GitHubIcon,
-    },
-  },
-  {
-    name: "Spectrum",
-    href: "https://spectrum.chat",
-    role: "Co-founder",
-    period: "2017–18",
-    icon: {
-      type: "image",
-      src: "/img/spectrum.png",
-      alt: "Spectrum",
-    },
-  },
-  {
-    name: "Facebook",
-    href: "https://facebook.com",
-    role: "Product Designer",
-    period: "2015–17",
-    icon: {
-      type: "image",
-      src: "/img/facebook.png",
-      alt: "Facebook",
-    },
-  },
-  {
-    name: "Buffer",
-    href: "https://buffer.com",
-    role: "Product Designer",
-    period: "2013–15",
-    icon: {
-      type: "svg",
-      component: BufferLogoSVG,
-    },
-  },
-];
+// work items removed

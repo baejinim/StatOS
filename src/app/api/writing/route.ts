@@ -19,7 +19,8 @@ export async function GET(request: Request) {
     }
 
     const items = allItems.slice(startIndex, startIndex + limit);
-    const nextCursor = startIndex + limit < allItems.length ? items[items.length - 1]?.id || null : null;
+    const nextCursor =
+      startIndex + limit < allItems.length ? items[items.length - 1]?.id || null : null;
 
     return cachedResponse({ items, nextCursor }, 86400); // 24 hour cache
   } catch (error) {

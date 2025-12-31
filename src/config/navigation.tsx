@@ -1,15 +1,9 @@
 import React from "react";
 
-import { AppDissection } from "@/components/icons/AppDissection";
-import { Ballot } from "@/components/icons/Ballot";
-import { BrowserTabs } from "@/components/icons/BrowserTabs";
-import { DoubleChatBubble } from "@/components/icons/DoubleChatBubble";
 import { FileText2 } from "@/components/icons/FileText2";
-import { Headphones3 } from "@/components/icons/Headphones3";
 import { Home } from "@/components/icons/Home";
-import { Triangle } from "@/components/icons/Triangle";
 import { IconProps } from "@/components/icons/types";
-import { isFeatureEnabled } from "@/lib/features";
+// feature flags removed for non-writing features
 
 export interface NavigationItem {
   id: string;
@@ -39,84 +33,15 @@ export const navigationItems: NavigationItem[] = [
     icon: FileText2,
     keywords: ["writing", "blog", "posts"],
     isActive: (pathname) => pathname.startsWith("/writing"),
-    section: "main",
-    feature: "writing",
-  },
-  {
-    id: "better-hn",
-    label: "Hacker News",
-    href: "/hn",
-    icon: Triangle,
-    keywords: ["hackernews", "hn", "news"],
-    isActive: (pathname) => pathname.startsWith("/hn"),
     section: "projects",
-    feature: "hn",
-  },
-
-  {
-    id: "app-dissection",
-    label: "App Dissection",
-    href: "/app-dissection",
-    icon: AppDissection,
-    keywords: ["app", "dissection", "analysis"],
-    isActive: (pathname) => pathname.startsWith("/app-dissection"),
-    section: "projects",
-    feature: "appDissection",
-  },
-  {
-    id: "stack",
-    label: "Stack",
-    href: "/stack",
-    icon: Ballot,
-    keywords: ["stack", "tools", "tech"],
-    isActive: (pathname) => pathname.startsWith("/stack"),
-    section: "projects",
-    feature: "stack",
-  },
-  {
-    id: "ama",
-    label: "AMA",
-    href: "/ama",
-    icon: DoubleChatBubble,
-    keywords: ["ama", "questions", "ask"],
-    isActive: (pathname) => pathname.startsWith("/ama"),
-    section: "projects",
-    feature: "ama",
-  },
-
-  {
-    id: "music",
-    label: "Listening",
-    href: "/listening",
-    icon: Headphones3,
-    keywords: ["listening", "music", "audio"],
-    isActive: (pathname) => pathname === "/listening",
-    section: "projects",
-    feature: "listening",
-  },
-  {
-    id: "good-websites",
-    label: "Good websites",
-    href: "/sites",
-    icon: BrowserTabs,
-    keywords: ["good websites", "websites", "inspiration"],
-    isActive: (pathname) => pathname.startsWith("/sites"),
-    section: "projects",
-    feature: "sites",
   },
 ];
 
 // Helper functions to filter navigation items
 export const getMainNavigationItems = () =>
-  navigationItems.filter(
-    (item) => item.section === "main" && (!item.feature || isFeatureEnabled(item.feature as any)),
-  );
+  navigationItems.filter((item) => item.section === "main");
 
 export const getProjectNavigationItems = () =>
-  navigationItems.filter(
-    (item) =>
-      item.section === "projects" && (!item.feature || isFeatureEnabled(item.feature as any)),
-  );
+  navigationItems.filter((item) => item.section === "projects");
 
-export const getAllNavigationItems = () =>
-  navigationItems.filter((item) => !item.feature || isFeatureEnabled(item.feature as any));
+export const getAllNavigationItems = () => navigationItems;

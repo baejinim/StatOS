@@ -1,14 +1,14 @@
 import fs from "fs";
 import matter from "gray-matter";
-import path from "path";
 import katex from "katex";
+import path from "path";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { visit } from "unist-util-visit";
 import { z } from "zod";
 
-import type { NotionItem, ProcessedBlock, RichTextContent } from "@/lib/notion/types";
+import type { NotionItem, ProcessedBlock, RichTextContent } from "@/lib/writing/types";
 
 const writingDirectory = path.join(process.cwd(), "src/content/writing");
 
@@ -83,7 +83,7 @@ function extractPlainTextFromMarkdown(markdown: string): string {
   }
 
   visit(tree, extractText);
-  
+
   // Normalize: remove markdown syntax remnants, normalize whitespace
   return textParts
     .join(" ")
@@ -99,13 +99,13 @@ function markdownToBlocks(markdown: string): ProcessedBlock[] {
   // Parse markdown with math support
   const processor = remark().use(remarkGfm).use(remarkMath);
   const tree = processor.parse(markdown);
-  
+
   const blocks: ProcessedBlock[] = [];
   let blockIdCounter = 0;
-  
+
   // Map to store rendered math HTML by node
   const mathHtmlMap = new Map<any, string>();
-  
+
   // First pass: render math expressions with KaTeX
   visit(tree, (node: any) => {
     if (node.type === "inlineMath") {
@@ -133,7 +133,10 @@ function markdownToBlocks(markdown: string): ProcessedBlock[] {
     }
   });
 
-  function createRichText(text: string, annotations?: Partial<RichTextContent["annotations"]>): RichTextContent {
+  function createRichText(
+    text: string,
+    annotations?: Partial<RichTextContent["annotations"]>,
+  ): RichTextContent {
     return {
       type: "text",
       text: {
@@ -161,66 +164,30 @@ function markdownToBlocks(markdown: string): ProcessedBlock[] {
     return found;
   }
 
-  // Helper to extract rich text with math HTML replacement
-  function extractRichTextWithMath(node: any): RichTextContent[] {
-    const result: RichTextContent[] = [];
-    
-    function traverse(n: any): void {
-      if (n.type === "text") {
-        result.push(createRichText(n.value));
-      } else if (n.type === "inlineMath") {
-        // Replace inline math with placeholder, store HTML separately
-        const mathHtml = mathHtmlMap.get(n) || n.value;
-        // We'll handle this in the paragraph rendering
-        result.push(createRichText(`[MATH:${mathHtml}]`));
-      } else if (n.type === "strong" || n.type === "emphasis" || n.type === "inlineCode" || n.type === "link") {
-        if (n.children) {
-          n.children.forEach((child: any) => {
-            if (child.type === "text") {
-              const annotations: Partial<RichTextContent["annotations"]> = {};
-              if (n.type === "strong") annotations.bold = true;
-              if (n.type === "emphasis") annotations.italic = true;
-              if (n.type === "inlineCode") annotations.code = true;
+  // Removed unused rich-text-with-math helper to simplify pipeline
 
-              const richText = createRichText(child.value, annotations);
-              if (n.type === "link") {
-                richText.text.link = n.url;
-              }
-              result.push(richText);
-            } else {
-              traverse(child);
-            }
-          });
-        }
-      } else if (n.children) {
-        n.children.forEach(traverse);
+  // Helper to check if paragraph contains block math (should be split)
+  function hasBlockMath(node: any): boolean {
+    let found = false;
+    visit(node, (n: any) => {
+      if (n.type === "math") {
+        found = true;
       }
-    }
-
-    if (node.children) {
-      node.children.forEach(traverse);
-    }
-
-    return result.length > 0 ? result : [createRichText(extractTextFromNode(node))];
+    });
+    return found;
   }
 
-  // Helper to build HTML for paragraph with inline math only
-  // Block math ($$...$$) is handled separately as "math" type block
+  // Build HTML for a paragraph node that may contain inline math
   function buildParagraphHtml(node: any): string {
     let html = "";
-    
+
     function traverse(n: any): void {
-      // Skip block math - it should be handled as separate block
-      if (n.type === "math") {
-        return;
-      }
-      
+      if (!n) return;
       if (n.type === "text") {
-        html += escapeHtml(n.value);
+        html += n.value;
       } else if (n.type === "inlineMath") {
-        // Inline math: render as <span class="katex">...</span>
         const mathHtml = mathHtmlMap.get(n) || n.value;
-        html += mathHtml; // KaTeX already wraps in <span class="katex">
+        html += mathHtml;
       } else if (n.type === "strong") {
         html += "<strong>";
         if (n.children) n.children.forEach(traverse);
@@ -234,7 +201,8 @@ function markdownToBlocks(markdown: string): ProcessedBlock[] {
         if (n.children) n.children.forEach(traverse);
         html += "</code>";
       } else if (n.type === "link") {
-        html += `<a href="${escapeHtml(n.url)}" target="_blank" rel="noopener noreferrer" class="link-body">`;
+        const href = (n.url || "").replace(/\"/g, "&quot;");
+        html += `<a href="${href}" target="_blank" rel="noopener noreferrer" class="link-body">`;
         if (n.children) n.children.forEach(traverse);
         html += "</a>";
       } else if (n.children) {
@@ -242,31 +210,8 @@ function markdownToBlocks(markdown: string): ProcessedBlock[] {
       }
     }
 
-    if (node.children) {
-      node.children.forEach(traverse);
-    }
-
+    if (node.children) node.children.forEach(traverse);
     return html;
-  }
-  
-  // Helper to check if paragraph contains block math (should be split)
-  function hasBlockMath(node: any): boolean {
-    let found = false;
-    visit(node, (n: any) => {
-      if (n.type === "math") {
-        found = true;
-      }
-    });
-    return found;
-  }
-
-  function escapeHtml(text: string): string {
-    return text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
   }
 
   function processNode(node: any): void {
@@ -290,7 +235,7 @@ function markdownToBlocks(markdown: string): ProcessedBlock[] {
           if (hasBlockMath(node)) {
             // Split paragraph: extract block math as separate blocks
             let currentParagraph: any[] = [];
-            
+
             function processParagraphChildren(children: any[]): void {
               for (const child of children) {
                 if (child.type === "math") {
@@ -328,9 +273,9 @@ function markdownToBlocks(markdown: string): ProcessedBlock[] {
                 }
               }
             }
-            
+
             processParagraphChildren(node.children || []);
-            
+
             // Flush remaining paragraph content
             if (currentParagraph.length > 0) {
               const paraNode = { ...node, children: currentParagraph };
@@ -370,7 +315,7 @@ function markdownToBlocks(markdown: string): ProcessedBlock[] {
           }
         }
         break;
-      
+
       case "math":
         // Block math: $$ ... $$ - render as separate block, not inside paragraph
         const blockMathHtml = mathHtmlMap.get(node) || node.value;
@@ -462,7 +407,12 @@ function markdownToBlocks(markdown: string): ProcessedBlock[] {
     function traverse(n: any): void {
       if (n.type === "text") {
         result.push(createRichText(n.value));
-      } else if (n.type === "strong" || n.type === "emphasis" || n.type === "inlineCode" || n.type === "link") {
+      } else if (
+        n.type === "strong" ||
+        n.type === "emphasis" ||
+        n.type === "inlineCode" ||
+        n.type === "link"
+      ) {
         if (n.children) {
           n.children.forEach((child: any) => {
             if (child.type === "text") {
@@ -494,7 +444,18 @@ function markdownToBlocks(markdown: string): ProcessedBlock[] {
   }
 
   visit(tree, (node) => {
-    if (["heading", "paragraph", "blockquote", "list", "code", "thematicBreak", "image", "math"].includes(node.type)) {
+    if (
+      [
+        "heading",
+        "paragraph",
+        "blockquote",
+        "list",
+        "code",
+        "thematicBreak",
+        "image",
+        "math",
+      ].includes(node.type)
+    ) {
       processNode(node);
     }
   });
@@ -661,4 +622,3 @@ export function getWritingPostContentBySlug(
     metadata: writingPostToNotionItem(post),
   };
 }
-

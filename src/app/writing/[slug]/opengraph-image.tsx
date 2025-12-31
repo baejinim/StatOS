@@ -1,6 +1,6 @@
-import { getWritingPostContentBySlug } from "@/lib/writing/fs";
 import { SITE_CONFIG } from "@/lib/metadata";
 import { generateOGImage } from "@/lib/og-utils";
+import { getWritingPostContentBySlug } from "@/lib/writing/fs";
 
 export const runtime = "nodejs";
 export const revalidate = 86400; // 24 hours
