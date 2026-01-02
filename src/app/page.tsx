@@ -17,7 +17,7 @@ import { createMetadata, createPersonJsonLd } from "@/lib/metadata";
 export const metadata: Metadata = createMetadata({
   title: "Jiwon Bae",
   description:
-    "Jiwon Bae is a student at Konkuk University, studying Computer Science and Applied Statistics.",
+    "Jiwon Bae is a student at Konkuk University, Studying Computer Science and Applied Statistics.",
   path: "/",
 });
 
@@ -48,7 +48,7 @@ export default function Home() {
               </h1>
 
               <p className="text-secondary text-2xl font-semibold text-pretty">
-                Student at Konkuk Univ, studying Computer Science & Applied Statistics
+                Student at Konkuk Univ, Studying Computer Science & Applied Statistics
               </p>
             </Section>
 
@@ -106,7 +106,7 @@ const projects = [
   {
     name: "Writing",
     href: "/writing",
-    description: "Notes on software and other things",
+    description: "Statistics, Programming, and other Essays.",
     external: false,
   },
 ];
