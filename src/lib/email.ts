@@ -7,10 +7,10 @@ import { HackerNewsPost } from "@/types/hackernews";
  */
 
 // Email constants
-export const BASE_EMAIL = "hi@brianlovin.com";
+export const BASE_EMAIL = "hi@jiwonbae.site";
 
 export const BASE_URL =
-  process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://brianlovin.com";
+  process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://jiwonbae.site";
 
 const POSTMARK_TEMPLATE_ID = 18037634;
 

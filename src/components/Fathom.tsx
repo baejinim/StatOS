@@ -12,7 +12,7 @@ function TrackPageView() {
   useEffect(() => {
     load("ONFMHEEY", {
       auto: false,
-      includedDomains: ["brianlovin.com"],
+      includedDomains: ["jiwonbae.site"],
     });
   }, []);
 
