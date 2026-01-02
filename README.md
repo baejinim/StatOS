@@ -1,3 +1,1 @@
-# briOS
-
-My website — https://brianlovin.com
+jiwonbae.site
